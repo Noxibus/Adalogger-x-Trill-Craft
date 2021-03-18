@@ -7,11 +7,11 @@
 const int chipSelect = 4; //make sure this is the right pin for adalogger
 
 Trill trillSensor;
+int data = 0;
 
 void setup() {
+  Serial.begin(115200);
 
-//  Serial.begin(115200);
-Serial.begin(9600);
   while (!Serial) {// wait for serial port to connect. Needed for native USB port only
   }
   Serial.print("Initializing SD card...");
@@ -34,7 +34,7 @@ void loop() {
   trillSensor.requestRawData();
 
   while (trillSensor.rawDataAvailable() > 0) {
-    int data = trillSensor.rawDataRead();
+    data = trillSensor.rawDataRead();
     if (data < 1000)
       Serial.print(0);
     if (data < 100)
@@ -44,23 +44,18 @@ void loop() {
     Serial.print(data);
     Serial.print(" ");
   }
- Serial.print(" ");
-  String dataString = "";
-  for (int analogPin = 0; analogPin < 3; analogPin++) {
-    int sensor = analogRead(analogPin); //what is this doing
-    dataString += String(sensor);
-    if (analogPin < 2) {
-      dataString += ",";
-    }
-  }
-  File dataFile = SD.open("trillData.txt", FILE_WRITE);
+ 
+//  File dataFile = SD.open("trillData.txt", FILE_WRITE);
+File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  //int data = trillSensor.rawDataRead();
   if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.println(",");
+   dataFile.println(data);  //only one line of data being printed to file
+   // dataFile.println(",");
     dataFile.close();
-    Serial.println(dataString);
+    Serial.println(data);  
   } else {
-    Serial.println("error opening trillData.txt");
+    Serial.println("error opening file"); //error fixed by changing name back to datalog idk why
   }
   delay(50);
+
 }
